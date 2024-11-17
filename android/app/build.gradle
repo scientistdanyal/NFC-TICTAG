@@ -1,0 +1,61 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"  // Flutter Gradle Plugin
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
+def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
+
+// Load keystore properties from key.properties
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace = "com.example.nfc_functional"  // Update to match your package structure
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId = "com.tictag.nfc_app"  // Unique application ID for your app
+        minSdkVersion 26  // Minimum SDK version
+        targetSdk = flutter.targetSdkVersion  // Target SDK version
+        versionCode = flutterVersionCode.toInteger()  // Version code from local.properties
+        versionName = flutterVersionName  // Version name from local.properties
+    }
+
+    signingConfigs {
+        release {
+            keyAlias = keystoreProperties['keyAlias']  // Alias for the key
+            keyPassword = keystoreProperties['keyPassword']  // Key password
+            storeFile = keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null  // Keystore file
+            storePassword = keystoreProperties['storePassword']  // Keystore password
+        }
+    }
+    
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.release  // Use the release signing config
+        }
+    }
+}
+
+flutter {
+    source = "../.."  // Path to the Flutter source
+}
